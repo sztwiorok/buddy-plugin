@@ -28,27 +28,12 @@ Claude Code plugin for seamless integration with Buddy.works. Deploy application
 
 ### Install Plugin
 
-**Option 1: One-Time Usage (with --plugin-dir flag)**
+**Option 1: Permanent Installation (recommended)**
 
-Use plugin without permanent installation:
-
-```bash
-# Clone the repository
-git clone https://github.com/sztwiorok/buddy-plugin.git buddy-plugin
-
-# Use plugin for this session only
-cd buddy-plugin
-cc --plugin-dir .
-```
-
-This loads the plugin for current session. You need to use `--plugin-dir` flag every time.
-
-**Option 2: Permanent Installation (recommended)**
-
-Install plugin permanently:
+Install plugin permanently for all sessions:
 
 ```bash
-# Clone directly to Claude plugins directory
+# Clone to Claude plugins directory
 git clone https://github.com/sztwiorok/buddy-plugin.git ~/.claude/plugins/buddy
 
 # Plugin auto-loads in all sessions
@@ -56,6 +41,21 @@ cc
 ```
 
 The plugin is now permanently available in all Claude Code sessions.
+
+**Option 2: Development/Testing (with --plugin-dir flag)**
+
+For plugin development or testing:
+
+```bash
+# Clone to any location
+git clone https://github.com/sztwiorok/buddy-plugin.git ~/projects/buddy-plugin
+
+# Use from your project directory
+cd ~/my-app
+cc --plugin-dir ~/projects/buddy-plugin
+```
+
+This loads the plugin for current session only. Useful for testing plugin changes during development.
 
 ## Quick Start
 

@@ -1,6 +1,6 @@
 ---
-name: bdy-sandbox
-description: Deploy and test applications in Buddy Sandbox cloud environments. Use when user asks about deploying apps, testing in isolated environments, sandboxes, remote environments, exposing apps via public URL, or running apps somewhere accessible.
+name: sandbox
+description: Deploy and test applications in Buddy Sandbox cloud environments. Use when user asks about "deploy app", "create sandbox", "test in cloud", "isolated environment", "remote environment", "run app in sandbox", or mentions deploying, testing, or running applications in cloud sandboxes.
 ---
 
 # Buddy Sandbox Deployment
@@ -9,14 +9,13 @@ On-demand cloud environments for deploying and testing applications with public 
 
 ## Prerequisites
 
-```bash
-# Interactive login (recommended)
-bdy login
+**Authentication Required:** Sandboxes require Buddy CLI authentication. For installation and authentication setup, see the [bdy-auth](../bdy-auth/SKILL.md) skill.
 
-# Or environment variables
-export BDY_API_TOKEN="your-token"
-export BDY_WORKSPACE="your-workspace"
-export BDY_PROJECT="your-project"
+**Note:** If user is not authenticated, ask them to run `bdy login` in a separate terminal (interactive login cannot be performed by AI agents) or use token-based authentication.
+
+Verify authentication:
+```bash
+bdy workspace ls
 ```
 
 ## Quick Deployment Workflow

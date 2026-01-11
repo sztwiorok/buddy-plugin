@@ -32,17 +32,20 @@ Claude Code plugin for seamless integration with Buddy.works. Deploy application
 
 ```bash
 # Clone the repository
-git clone https://github.com/sztwiorok/buddy-plugin.git
+git clone https://github.com/sztwiorok/buddy-plugin.git buddy-plugin
 
 # Install plugin
-cc --plugin-dir /path/to/buddy-plugin
+cc --plugin-dir buddy-plugin
 ```
 
 **Option 2: Link for Development**
 
 ```bash
+# Clone the repository
+git clone https://github.com/sztwiorok/buddy-plugin.git buddy-plugin
+
 # Link plugin directory
-ln -s /path/to/buddy-plugin ~/.claude/plugins/buddy
+ln -s $(pwd)/buddy-plugin ~/.claude/plugins/buddy
 
 # Restart Claude Code
 ```

@@ -80,14 +80,29 @@ bdy tunnel http http://localhost:8080
 - `-w, --whitelist` - IP address restrictions
 - `-r, --region` - Regional endpoint (eu, us, as)
 
-If you expose HTTP ask (using the AskUserQuestionTool) user if they want to add authentication
-They can protect the tunnel with username and password or Buddy authentication.
+## CRITICAL SECURITY REQUIREMENT for HTTP Tunnels
+
+**MANDATORY:** Before exposing ANY HTTP tunnel, you MUST use the AskUserQuestionTool to ask if they want to protect the tunnel with authentication.
+
+DO NOT proceed with creating an HTTP tunnel until the user has made a choice about authentication.
+
+Ask the user:
+- **Question:** "Do you want to protect this HTTP tunnel with authentication?"
+- **Options:**
+  1. "HTTP Basic Auth (username:password)" - Use `-a username:password` flag
+  2. "Buddy Authentication" - Use `--buddy` flag (requires Buddy account)
+  3. "No authentication (public access)" - Proceed without auth flags
 
 **Example with auth:**
 ```bash
+# With HTTP basic auth
 bdy tunnel http localhost:3000 -a username:password
+
+# With Buddy authentication
 bdy tunnel http localhost:3000 --buddy
-```
+
+# Without authentication (only after user confirms)
+bdy tunnel http localhost:3000
 ```
 
 ### TCP Tunnels

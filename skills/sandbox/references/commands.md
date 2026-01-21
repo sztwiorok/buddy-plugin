@@ -29,16 +29,20 @@ bdy sandbox destroy <identifier>       # Delete sandbox (alias: rm)
 | `-n, --name <name>` | Display name |
 | `--os <image>` | OS image (default: ubuntu:24.04) |
 | `--resources <spec>` | Resources: 1x2, 2x4, 4x8, 8x16, 12x24 (CPUxRAM) |
-| `--install-commands <cmd>` | Setup commands (repeatable) |
+| `--install-command <cmd>` | Setup command (repeatable) |
 | `--run-command <cmd>` | Startup command |
 | `--snapshot <name>` | Create from snapshot |
 
 ## Execution Commands
 
 ```bash
-bdy sandbox exec <identifier> "<command>"                  # Execute command
-bdy sandbox exec <identifier> -d "<command>"               # Run detached
-bdy sandbox exec <identifier> --runtime PYTHON "<code>"    # Different runtime
+bdy sandbox exec command <identifier> "<command>"                  # Execute (background)
+bdy sandbox exec command <identifier> "<command>" --wait           # Execute and wait
+bdy sandbox exec command <identifier> --runtime PYTHON "<code>"    # Different runtime
+bdy sandbox exec list <identifier>                                 # List commands
+bdy sandbox exec logs <identifier> <command-id>                    # View logs
+bdy sandbox exec logs <identifier> <command-id> -f                 # Stream logs
+bdy sandbox exec kill <identifier> <command-id>                    # Kill command
 ```
 
 ### Exec Options
@@ -46,7 +50,7 @@ bdy sandbox exec <identifier> --runtime PYTHON "<code>"    # Different runtime
 | Option | Description |
 |--------|-------------|
 | `--runtime <type>` | BASH (default), JAVASCRIPT, TYPESCRIPT, PYTHON |
-| `-d, --detached` | Run in background |
+| `--wait` | Block until command completes (default: background) |
 
 ## File Transfer
 
@@ -63,8 +67,8 @@ bdy sandbox cp --silent ./file my-app:/app/file     # Silent mode (recommended)
 ```bash
 bdy sandbox endpoint list <identifier>                             # List (alias: ep list)
 bdy sandbox endpoint get <identifier> <name>                       # Get details
-bdy sandbox endpoint add <identifier> -n <name> --port <port>      # Add
-bdy sandbox endpoint update <identifier> <name> --port <new-port>  # Update
+bdy sandbox endpoint add <identifier> -n <name> -e <port>          # Add
+bdy sandbox endpoint update <identifier> <name> -e <new-port>      # Update
 bdy sandbox endpoint delete <identifier> <name>                    # Delete
 ```
 
@@ -73,7 +77,7 @@ bdy sandbox endpoint delete <identifier> <name>                    # Delete
 | Option | Description |
 |--------|-------------|
 | `-n, --name <name>` | Endpoint name (required) |
-| `--port <port>` | Port number (required) |
+| `-e, --endpoint <port>` | Port number (required) |
 | `-t, --type <type>` | HTTP, TLS, or TCP (default: HTTP) |
 | `--auth <type>` | NONE, BASIC, or BUDDY |
 | `--username/--password` | For BASIC auth |
@@ -90,13 +94,13 @@ bdy sandbox snapshot delete <identifier> <name>     # Delete
 
 ## Command Management
 
+Commands are managed via `bdy sandbox exec` subcommands (see [Execution Commands](#execution-commands)):
+
 ```bash
-bdy sandbox command list <identifier>               # List all (alias: cmd ls)
-bdy sandbox command status <identifier> <cmd-id>    # Get status
-bdy sandbox command logs <identifier> <cmd-id>      # View logs
-bdy sandbox command logs <identifier> --last        # Most recent logs
-bdy sandbox command logs <identifier> <cmd-id> -f   # Stream logs
-bdy sandbox command kill <identifier> <cmd-id>      # Kill command
+bdy sandbox exec list <identifier>                  # List all commands
+bdy sandbox exec logs <identifier> <cmd-id>         # View logs
+bdy sandbox exec logs <identifier> <cmd-id> -f      # Stream logs
+bdy sandbox exec kill <identifier> <cmd-id>         # Kill command
 ```
 
-**Tip:** Use `command list` to discover command IDs, then `logs --last` to check output.
+**Tip:** Use `exec list` to discover command IDs, then `exec logs` to check output.

@@ -19,12 +19,12 @@ bdy sandbox cp --silent ./src my-app:/app    # correct
 bdy sandbox cp ./src my-app:/app             # WRONG - floods output
 ```
 
-### 2. Run apps in detached mode (`-d`)
+### 2. Commands run in background by default
 
-Use `-d` flag for long-running processes, otherwise command blocks:
+Commands execute asynchronously by default. Use `--wait` to block until completion:
 ```bash
-bdy sandbox exec my-app -d "npm start"       # correct - runs in background
-bdy sandbox exec my-app "npm start"          # WRONG - blocks execution
+bdy sandbox exec command my-app "npm start"          # runs in background (default)
+bdy sandbox exec command my-app "npm install" --wait # blocks until done
 ```
 
 ### 3. Apps must bind to `0.0.0.0`
@@ -40,7 +40,7 @@ python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt
 
 ## Prerequisites
 
-**Authentication Required:** Verify with `bdy workspace ls`. If fails, user must run `bdy login` in separate terminal.
+**Authentication Required:** Verify with `bdy whoami`. If fails, user must run `bdy login` in separate terminal.
 
 ## Quick Deployment Workflow
 
@@ -48,7 +48,7 @@ python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt
 
 ```bash
 bdy sandbox create -i my-app --resources 2x4 \
-  --install-commands "apt-get update && apt-get install -y nodejs npm"
+  --install-command "apt-get update && apt-get install -y nodejs npm"
 ```
 
 Resources: 1x2, 2x4, 4x8, 8x16, 12x24 (CPUxRAM). Default OS: Ubuntu 24.04.
@@ -57,14 +57,14 @@ Resources: 1x2, 2x4, 4x8, 8x16, 12x24 (CPUxRAM). Default OS: Ubuntu 24.04.
 
 ```bash
 bdy sandbox cp --silent ./src my-app:/app
-bdy sandbox exec my-app "cd /app && npm install"
-bdy sandbox exec my-app -d "cd /app && npm start"
+bdy sandbox exec command my-app "cd /app && npm install" --wait
+bdy sandbox exec command my-app "cd /app && npm start"
 ```
 
 ### 3. Expose Endpoint
 
 ```bash
-bdy sandbox endpoint add my-app -n web --port 3000
+bdy sandbox endpoint add my-app -n web -e 3000
 ```
 
 With auth: `--auth BASIC --username admin --password secret`
@@ -72,8 +72,9 @@ With auth: `--auth BASIC --username admin --password secret`
 ### 4. Check Status
 
 ```bash
-bdy sandbox endpoint list my-app        # Get public URL
-bdy sandbox command logs my-app --last  # View recent logs
+bdy sandbox endpoint list my-app                   # Get public URL
+bdy sandbox exec list my-app                       # List executed commands
+bdy sandbox exec logs my-app <command-id>          # View command logs
 ```
 
 ## References

@@ -1,0 +1,36 @@
+{
+  "name": "buddy-plugin",
+  "owner": {
+    "name": "Rafal Sztwiorok"
+  },
+  "metadata": {
+    "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "buddy",
+      "source": ".",
+      "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
+      "version": "0.1.5",
+      "author": {
+        "name": "Rafal Sztwiorok"
+      },
+      "repository": "https://github.com/sztwiorok/buddy-plugin",
+      "license": "MIT",
+      "keywords": [
+        "deployment",
+        "deploy",
+        "expose localhost",
+        "tunnels",
+        "buddy",
+        "ci-cd",
+        "devops",
+        "sandboxes",
+        "pipelines",
+        "packages"
+      ],
+      "category": "deployment"
+    }
+  ]
+}

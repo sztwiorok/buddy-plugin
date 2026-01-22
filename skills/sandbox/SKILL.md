@@ -96,4 +96,5 @@ bdy sandbox exec logs my-app <command-id>          # View command logs
 
 - **[references/commands.md](references/commands.md)** - Full command reference
 - **[references/examples.md](references/examples.md)** - Simple deployment examples (Node.js, Flask)
-- **[references/examples/wordpress.md](references/examples/wordpress.md)** - WordPress + MySQL + phpMyAdmin (multi-service)
+- **[references/examples/nodejs-postgresql.md](references/examples/nodejs-postgresql.md)** - Node.js REST API + PostgreSQL
+- **[references/examples/wordpress.md](references/examples/wordpress.md)** - WordPress + MySQL + phpMyAdmin (LAMP stack)

@@ -6,6 +6,10 @@
 - [Local Files with cp](#local-files-with-cp)
 - [Check Application Status](#check-application-status)
 
+## Dedicated Examples (Multi-Service)
+- **[examples/nodejs-postgresql.md](examples/nodejs-postgresql.md)** - Node.js REST API with PostgreSQL database
+- **[examples/wordpress.md](examples/wordpress.md)** - WordPress + MySQL + phpMyAdmin (LAMP stack)
+
 ## Node.js from Git
 
 ```bash

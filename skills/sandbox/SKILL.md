@@ -38,6 +38,21 @@ PEP 668 enforced - pip install fails without venv:
 python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt
 ```
 
+### 5. Creating config files: write locally → cp
+
+Never use heredoc through `exec command` for complex files - escaping is error-prone. Instead:
+```bash
+# 1. Write file locally (content exactly as needed)
+cat > /tmp/config.php << 'EOF'
+<?php
+$cfg['blowfish_secret'] = 'your-secret-key';
+$cfg['Servers'][1]['host'] = 'localhost';
+EOF
+
+# 2. Copy to sandbox (no escaping issues)
+bdy sandbox cp --silent /tmp/config.php my-app:/etc/app/config.php
+```
+
 ## Prerequisites
 
 **Authentication Required:** Verify with `bdy whoami`. If fails, user must run `bdy login` in separate terminal.
@@ -80,4 +95,5 @@ bdy sandbox exec logs my-app <command-id>          # View command logs
 ## References
 
 - **[references/commands.md](references/commands.md)** - Full command reference
-- **[references/examples.md](references/examples.md)** - Complete deployment examples
+- **[references/examples.md](references/examples.md)** - Simple deployment examples (Node.js, Flask)
+- **[references/examples/wordpress.md](references/examples/wordpress.md)** - WordPress + MySQL + phpMyAdmin (multi-service)

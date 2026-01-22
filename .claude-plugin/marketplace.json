@@ -10,7 +10,10 @@
   "plugins": [
     {
       "name": "buddy",
-      "source": ".",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/sztwiorok/buddy-plugin"
+      },
       "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
       "author": {
         "name": "Rafal Sztwiorok"

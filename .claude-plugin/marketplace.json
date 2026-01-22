@@ -12,12 +12,12 @@
       "name": "buddy",
       "source": ".",
       "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
-        "author": {
-            "name": "Rafal Sztwiorok"
-          },
+      "author": {
+        "name": "Rafal Sztwiorok"
+      },
       "version": "0.1.5",
       "category": "integrations",
-      "keywords": ["deployment","deploy","expose localhost","tunnels","buddy","ci-cd","devops","sandboxes","pipelines","packages",
+      "keywords": ["deployment", "deploy", "expose localhost", "tunnels", "buddy", "ci-cd", "devops", "sandboxes", "pipelines", "packages"],
       "name": "buddy"
     }
   ]

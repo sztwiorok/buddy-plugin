@@ -1,6 +1,6 @@
 {
   "name": "buddy",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
   "author": {
     "name": "Rafal Sztwiorok"

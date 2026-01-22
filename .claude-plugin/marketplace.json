@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "buddy",
-      "path": ".",
+      "source": "./",
       "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
       "version": "0.1.5",
       "author": {

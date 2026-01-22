@@ -53,6 +53,27 @@ EOF
 bdy sandbox cp --silent /tmp/config.php my-app:/etc/app/config.php
 ```
 
+### 6. Web apps run behind reverse proxy
+
+Apps must handle `X-Forwarded-Proto` header for correct HTTPS detection:
+```php
+// PHP
+if ($_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') $_SERVER['HTTPS'] = 'on';
+```
+```js
+// Express.js
+app.set('trust proxy', true);
+```
+Without this, apps may redirect to localhost or generate incorrect URLs.
+
+### 7. MUST READ stack-specific guides before deploying
+
+If deploying WordPress, CMS, or multi-service stacks - you MUST read the reference guide BEFORE starting:
+- **WordPress/PHP** → [references/examples/wordpress.md](references/examples/wordpress.md)
+- **Node.js + DB** → [references/examples/nodejs-postgresql.md](references/examples/nodejs-postgresql.md)
+
+These contain critical configuration (reverse proxy URLs, service setup) that WILL cause failures if skipped.
+
 ## Prerequisites
 
 **Authentication Required:** Verify with `bdy whoami`. If fails, user must run `bdy login` in separate terminal.
@@ -92,9 +113,14 @@ bdy sandbox exec list my-app                       # List executed commands
 bdy sandbox exec logs my-app <command-id>          # View command logs
 ```
 
+### 5. Verify Deployment
+
+```bash
+curl -I <public-url>  # Expect 200 OK, not redirect to localhost
+```
+If redirects to localhost → configure reverse proxy headers (see CRITICAL #6).
+
 ## References
 
-- **[references/commands.md](references/commands.md)** - Full command reference
-- **[references/examples.md](references/examples.md)** - Simple deployment examples (Node.js, Flask)
-- **[references/examples/nodejs-postgresql.md](references/examples/nodejs-postgresql.md)** - Node.js REST API + PostgreSQL
-- **[references/examples/wordpress.md](references/examples/wordpress.md)** - WordPress + MySQL + phpMyAdmin (LAMP stack)
+- [references/commands.md](references/commands.md) - Full command reference
+- [references/examples.md](references/examples.md) - Simple deployment examples (Node.js, Flask)

@@ -35,6 +35,7 @@ The `description` field determines when Claude automatically loads the skill bas
 - **bdy-auth**: CLI installation and authentication (`bdy login`, tokens, environment variables)
 - **sandbox**: Deploying apps to Buddy Sandbox cloud environments
 - **tunnel**: Exposing localhost services via Buddy tunnels
+- **sandbox-agent**: Delegating AI tasks to Claude agents in sandboxes (YOLO mode, parallel execution, multi-agent comparison)
 
 ## Critical AI Agent Requirements
 
@@ -53,6 +54,14 @@ The `description` field determines when Claude automatically loads the skill bas
 - AI agents cannot perform `bdy login` (requires browser interaction)
 - User must run `bdy login` in separate terminal, or use token-based auth
 - Verify auth with `bdy whoami` before operations
+
+### Delegation Operations (sandbox-agent)
+- Always ask user about sandbox source, setup, and parallelism before delegating
+- Use `sudo -u claude -i -- claude --dangerously-skip-permissions -p "..."` for tasks
+- Use `-c` flag to continue previous session
+- Poll `exec logs` for live progress monitoring
+- For multi-agent: create multiple sandboxes, delegate same task, compare results
+- Reference sandbox skill for advanced features (endpoints, snapshots)
 
 ## Key Commands
 
@@ -77,6 +86,6 @@ bdy tunnel tcp localhost:5432 -n <name>
 ## Parent Plugin Structure
 
 This skills directory is part of a larger plugin at `../`:
-- `../commands/` - Slash commands (`/deploy`, `/expose`)
+- `../commands/` - Slash commands (`/deploy`, `/expose`, `/delegate`)
 - `../README.md` - Plugin documentation
 - `../.claude/settings.local.json` - Plugin permissions

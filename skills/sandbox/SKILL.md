@@ -7,120 +7,144 @@ description: Deploy and test applications in Buddy Sandbox cloud environments. U
 
 On-demand cloud environments for deploying and testing applications with public HTTP/TCP endpoints.
 
-## CRITICAL: AI Agent Requirements
-
-> **STOP: Read this section before any sandbox operation.**
-
-### 1. Always use `--silent` with `bdy sandbox cp`
-
-Without `--silent`, file copy floods stdout and breaks your execution:
-```bash
-bdy sandbox cp --silent ./src my-app:/app    # correct
-bdy sandbox cp ./src my-app:/app             # WRONG - floods output
-```
-
-### 2. Commands run in background by default
-
-Commands execute asynchronously by default. Use `--wait` to block until completion:
-```bash
-bdy sandbox exec command my-app "npm start"          # runs in background (default)
-bdy sandbox exec command my-app "npm install" --wait # blocks until done
-```
-
-### 3. Apps must bind to `0.0.0.0`
-
-Applications MUST bind to `0.0.0.0`, NOT `127.0.0.1` or `localhost`.
-
-### 4. Python on Ubuntu 24.04 requires venv
-
-PEP 668 enforced - pip install fails without venv:
-```bash
-python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt
-```
-
-### 5. Creating config files: write locally → cp
-
-Never use heredoc through `exec command` for complex files - escaping is error-prone. Instead:
-```bash
-# 1. Write file locally (content exactly as needed)
-cat > /tmp/config.php << 'EOF'
-<?php
-$cfg['blowfish_secret'] = 'your-secret-key';
-$cfg['Servers'][1]['host'] = 'localhost';
-EOF
-
-# 2. Copy to sandbox (no escaping issues)
-bdy sandbox cp --silent /tmp/config.php my-app:/etc/app/config.php
-```
-
-### 6. Web apps run behind reverse proxy
-
-Apps must handle `X-Forwarded-Proto` header for correct HTTPS detection:
-```php
-// PHP
-if ($_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') $_SERVER['HTTPS'] = 'on';
-```
-```js
-// Express.js
-app.set('trust proxy', true);
-```
-Without this, apps may redirect to localhost or generate incorrect URLs.
-
-### 7. MUST READ stack-specific guides before deploying
-
-If deploying WordPress, CMS, or multi-service stacks - you MUST read the reference guide BEFORE starting:
-- **WordPress/PHP** → [references/examples/wordpress.md](references/examples/wordpress.md)
-- **Node.js + DB** → [references/examples/nodejs-postgresql.md](references/examples/nodejs-postgresql.md)
-
-These contain critical configuration (reverse proxy URLs, service setup) that WILL cause failures if skipped.
-
 ## Prerequisites
 
-**Authentication Required:** Verify with `bdy whoami`. If fails, user must run `bdy login` in separate terminal.
+Verify authentication with `bdy whoami`. If it fails, user must run `bdy login` in a separate terminal.
 
-## Quick Deployment Workflow
+## Workflow
 
 ### 1. Create Sandbox
 
+**Basic creation:**
 ```bash
-bdy sandbox create -i my-app --resources 2x4 \
-  --install-command "apt-get update && apt-get install -y nodejs npm"
+bdy sandbox create -i my-app --resources 2x4 --wait-for-running
 ```
 
-Resources: 1x2, 2x4, 4x8, 8x16, 12x24 (CPUxRAM). Default OS: Ubuntu 24.04.
+**With install commands** (for dependencies):
+```bash
+bdy sandbox create -i my-app --resources 2x4 \
+  --install-command "apt-get update && apt-get install -y nodejs npm" \
+  --wait-for-configured
+```
 
-### 2. Deploy Application
+**Options:**
+- Resources: `1x2`, `2x4`, `4x8`, `8x16`, `12x24` (CPUxRAM)
+- `--wait-for-configured` - wait until install commands complete
+- `--wait-for-running` - wait until sandbox is running, it does not wait for install commands to complete
+
+### 2. Copy Files to Sandbox
 
 ```bash
 bdy sandbox cp --silent ./src my-app:/app
+```
+
+**ALWAYS use `--silent`** - without it, file copy floods stdout and breaks execution.
+
+### 3. Execute Commands
+
+Commands run in **background by default**.
+
+**With `--wait`** for operations that must complete before next step, logs are visible in output:
+```bash
 bdy sandbox exec command my-app "cd /app && npm install" --wait
+```
+
+**Without `--wait`** for long-running processes (servers):
+```bash
 bdy sandbox exec command my-app "cd /app && npm start"
 ```
 
-### 3. Expose Endpoint
+**Check status and logs:**
+```bash
+bdy sandbox exec list my-app                        # list commands
+bdy sandbox exec logs my-app <command-id>           # view logs
+bdy sandbox exec logs my-app <command-id> --wait    # wait for completion and show logs
+```
+
+
+**Creating config files:** Write locally, then copy - avoids escaping issues with heredoc through exec:
+```bash
+# 1. Write file locally
+cat > config.json << 'EOF'
+{"host": "localhost", "port": 3000}
+EOF
+
+# 2. Copy to sandbox
+bdy sandbox cp --silent config.json my-app:/app/config.json
+```
+
+### 4. Add Endpoints (optional)
 
 ```bash
 bdy sandbox endpoint add my-app -n web -e 3000
 ```
 
-With auth: `--auth BASIC --username admin --password secret`
+**Application MUST bind to `0.0.0.0`** (not `127.0.0.1` or `localhost`) - otherwise endpoint won't work.
 
-### 4. Check Status
-
+**With authentication:**
 ```bash
-bdy sandbox endpoint list my-app                   # Get public URL
-bdy sandbox exec list my-app                       # List executed commands
-bdy sandbox exec logs my-app <command-id>          # View command logs
+bdy sandbox endpoint add my-app -n web -e 3000 --auth BASIC --username admin --password secret
 ```
 
-### 5. Verify Deployment
-
+**Check endpoint URL:**
 ```bash
-curl -I <public-url>  # Expect 200 OK, not redirect to localhost
+bdy sandbox endpoint list my-app
 ```
-If redirects to localhost → configure reverse proxy headers (see CRITICAL #6).
+
+**Reverse proxy:** Apps run behind reverse proxy. Handle `X-Forwarded-Proto` for correct HTTPS detection:
+```js
+// Express.js
+app.set('trust proxy', true);
+```
+```php
+// PHP
+if ($_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') $_SERVER['HTTPS'] = 'on';
+```
+
+### 5. Copy Files from Sandbox
+
+The `bdy sandbox cp` command currently only supports uploading (localhost → sandbox). To download files from sandbox, use exec command with cat or base64.
+
+**Method 1: Small text files (<50KB)**
+```bash
+# Save output to variable, then filter CLI metadata
+output=$(bdy sandbox exec command my-sandbox "cat /path/to/file.txt" --wait 2>&1)
+echo "$output" | grep -v "Command id:" | grep -v "Command finished" | grep -v "New version" > local-file.txt
+```
+
+**Method 2: Larger text files (50KB - 500KB)**
+
+For larger files, use head with high line count to avoid truncation:
+```bash
+output=$(bdy sandbox exec command my-sandbox "head -5000 /path/to/large-file.txt" --wait 2>&1)
+echo "$output" | grep -v "Command id:" | grep -v "Command finished" | grep -v "New version" > local-file.txt
+```
+
+**Method 3: Directories or very large files (>500KB)**
+
+Use tar + base64 encoding:
+```bash
+# 1. Download as base64-encoded tar
+bdy sandbox exec command my-sandbox "tar -czf - -C /home/claude results | base64 -w0" --wait > /tmp/download_raw.txt 2>&1
+
+# 2. Filter CLI metadata
+grep -v "Command id:" /tmp/download_raw.txt | grep -v "Command finished" | grep -v "New version" > /tmp/download.b64
+
+# 3. Decode and extract
+mkdir -p ./downloaded
+cat /tmp/download.b64 | base64 -d | tar -xzf - -C ./downloaded/
+```           
+
+## CRITICAL: Read Examples Before Deploying These Tech Stacks
+
+**Single-Service:**
+- [Node.js](references/examples/nodejs.md)
+- [Python Flask](references/examples/python-flask.md)
+
+**Multi-Service** (read before deploying complex stacks):
+- [Node.js + PostgreSQL](references/examples/nodejs-postgresql.md)
+- [WordPress + MySQL + phpMyAdmin](references/examples/wordpress.md)
 
 ## References
 
-- [references/commands.md](references/commands.md) - Full command reference
-- [references/examples.md](references/examples.md) - Simple deployment examples (Node.js, Flask)
+- [Full command reference](references/commands.md)

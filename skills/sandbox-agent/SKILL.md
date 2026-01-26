@@ -175,6 +175,8 @@ bdy sandbox destroy agent-1 && bdy sandbox destroy agent-2 && bdy sandbox destro
 
 **Authentication Required:** Verify with `bdy whoami`. If fails, user must run `bdy login` in separate terminal.
 
+**Claude-enabled Sandbox Required:** The `sudo -u claude -i -- claude` command requires a sandbox with Claude Code pre-installed. Use a snapshot that has Claude configured, or create one with the Claude installation script.
+
 ## Advanced Features
 
 For advanced sandbox features, see the **sandbox skill**:
@@ -182,6 +184,7 @@ For advanced sandbox features, see the **sandbox skill**:
 - Snapshot management (`bdy sandbox snapshot create/list`)
 - Detailed file transfer options
 - Resource sizing recommendations
+- **WordPress + WP-CLI reference** - For WordPress theme deployment tasks
 
 ## References
 

@@ -1,119 +1,42 @@
-# WordPress + MySQL + phpMyAdmin
+# WordPress Deployment
 
-Complete LAMP stack deployment with WordPress and phpMyAdmin on separate ports.
+Deploy WordPress on Buddy Sandbox with WP-CLI for automation.
 
-## Result
+## Quick Reference
 
-| Service | Port | Public URL |
-|---------|------|------------|
-| WordPress | 80 | `https://wordpress-<sandbox>-<project>-<workspace>.us-1.buddy.app` |
-| phpMyAdmin | 8080 | `https://phpmyadmin-<sandbox>-<project>-<workspace>.us-1.buddy.app` |
+| Item | Value |
+|------|-------|
+| WordPress path | `/var/www/html/wordpress` |
+| Database | `wordpress` / `wpuser` / `wppass123` |
+| WP-CLI flag | `--allow-root` (required) |
 
-## Step 1: Create Sandbox with LAMP Stack
+## Step 1: Create Sandbox
 
 ```bash
-bdy sandbox create -i wordpress-lamp --resources 4x8 \
-  --install-command "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 mariadb-server php php-mysql php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip libapache2-mod-php unzip wget"
+bdy sandbox create -i wordpress --resources 4x8 \
+  --install-command "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 mariadb-server php php-mysql php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip libapache2-mod-php wget curl" \
+  --wait-for-configured
 ```
 
-Wait for setup to complete:
+## Step 2: Setup Database
+
 ```bash
-bdy sandbox status wordpress-lamp
-# Wait until Setup: SUCCESS
+bdy sandbox exec command wordpress "service mariadb start" --wait
+
+bdy sandbox exec command wordpress "mysql -e \"CREATE DATABASE wordpress; CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'wppass123'; GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost'; FLUSH PRIVILEGES;\"" --wait
 ```
 
-## Step 2: Configure MySQL
+## Step 3: Download WordPress & Install WP-CLI
 
 ```bash
-# Start MariaDB
-bdy sandbox exec command wordpress-lamp "service mariadb start" --wait
+bdy sandbox exec command wordpress "cd /var/www/html && wget -q https://wordpress.org/latest.tar.gz && tar -xzf latest.tar.gz && rm latest.tar.gz && chown -R www-data:www-data wordpress" --wait
 
-# Create database and user
-bdy sandbox exec command wordpress-lamp "mysql -e \"CREATE DATABASE wordpress; CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'wppass123'; GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost'; FLUSH PRIVILEGES;\"" --wait
+bdy sandbox exec command wordpress "curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp" --wait
 ```
 
-## Step 3: Download WordPress and phpMyAdmin
+## Step 4: Configure Apache
 
 ```bash
-# Download WordPress
-bdy sandbox exec command wordpress-lamp "cd /var/www/html && wget -q https://wordpress.org/latest.tar.gz && tar -xzf latest.tar.gz && rm latest.tar.gz" --wait
-
-# Download phpMyAdmin
-bdy sandbox exec command wordpress-lamp "cd /var/www/html && wget -q https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz && tar -xzf phpMyAdmin-5.2.1-all-languages.tar.gz && mv phpMyAdmin-5.2.1-all-languages phpmyadmin && rm phpMyAdmin-5.2.1-all-languages.tar.gz" --wait
-
-# Set permissions
-bdy sandbox exec command wordpress-lamp "chown -R www-data:www-data /var/www/html/wordpress /var/www/html/phpmyadmin" --wait
-```
-
-## Step 4: Configure WordPress
-
-**Important:** Use write locally → cp pattern to avoid escaping issues.
-
-```bash
-# Create wp-config.php locally with proxy support
-cat > /tmp/wp-config.php << 'EOF'
-<?php
-define('DB_NAME', 'wordpress');
-define('DB_USER', 'wpuser');
-define('DB_PASSWORD', 'wppass123');
-define('DB_HOST', 'localhost');
-define('DB_CHARSET', 'utf8mb4');
-define('DB_COLLATE', '');
-
-define('AUTH_KEY',         'unique-phrase-1');
-define('SECURE_AUTH_KEY',  'unique-phrase-2');
-define('LOGGED_IN_KEY',    'unique-phrase-3');
-define('NONCE_KEY',        'unique-phrase-4');
-define('AUTH_SALT',        'unique-phrase-5');
-define('SECURE_AUTH_SALT', 'unique-phrase-6');
-define('LOGGED_IN_SALT',   'unique-phrase-7');
-define('NONCE_SALT',       'unique-phrase-8');
-
-$table_prefix = 'wp_';
-define('WP_DEBUG', false);
-
-// CRITICAL: Proxy/HTTPS configuration for Buddy Sandbox
-define('WP_HOME', 'https://wordpress-wordpress-lamp-<PROJECT>-<WORKSPACE>.us-1.buddy.app');
-define('WP_SITEURL', 'https://wordpress-wordpress-lamp-<PROJECT>-<WORKSPACE>.us-1.buddy.app');
-define('FORCE_SSL_ADMIN', true);
-if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-    $_SERVER['HTTPS'] = 'on';
-}
-
-if (!defined('ABSPATH')) {
-    define('ABSPATH', __DIR__ . '/');
-}
-require_once ABSPATH . 'wp-settings.php';
-EOF
-
-# Copy to sandbox
-bdy sandbox cp --silent /tmp/wp-config.php wordpress-lamp:/var/www/html/wordpress/wp-config.php
-```
-
-**Note:** Replace `<PROJECT>` and `<WORKSPACE>` with actual values, or get the URL after creating endpoints and update the config.
-
-## Step 5: Configure phpMyAdmin
-
-```bash
-# Create config locally
-cat > /tmp/phpmyadmin-config.php << 'EOF'
-<?php
-$cfg['blowfish_secret'] = 'abcdefghijklmnopqrstuvwxyz123456';
-$i = 0;
-$i++;
-$cfg['Servers'][$i]['host'] = 'localhost';
-$cfg['Servers'][$i]['compress'] = false;
-$cfg['Servers'][$i]['AllowNoPassword'] = false;
-EOF
-
-# Copy to sandbox
-bdy sandbox cp --silent /tmp/phpmyadmin-config.php wordpress-lamp:/var/www/html/phpmyadmin/config.inc.php
-```
-
-## Step 6: Configure Apache Virtual Hosts
-
-```bash
-# WordPress VirtualHost (port 80)
 cat > /tmp/wordpress.conf << 'EOF'
 <VirtualHost *:80>
     DocumentRoot /var/www/html/wordpress
@@ -124,83 +47,133 @@ cat > /tmp/wordpress.conf << 'EOF'
 </VirtualHost>
 EOF
 
-# phpMyAdmin VirtualHost (port 8080)
-cat > /tmp/phpmyadmin.conf << 'EOF'
-Listen 8080
-<VirtualHost *:8080>
-    DocumentRoot /var/www/html/phpmyadmin
-    <Directory /var/www/html/phpmyadmin>
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
+bdy sandbox cp --silent /tmp/wordpress.conf wordpress:/etc/apache2/sites-available/wordpress.conf
+
+bdy sandbox exec command wordpress "rm -f /var/www/html/index.html && a2dissite 000-default && a2ensite wordpress && a2enmod rewrite && service apache2 restart" --wait
+```
+
+## Step 5: Expose Endpoint
+
+```bash
+bdy sandbox endpoint add wordpress -n wordpress -e 80
+# Output example: https://wordpress-wordpress-1-skills-tests-myplayground.us-1.buddy.app
+# Save this URL for the next steps!
+```
+
+## Step 6: Configure wp-config.php
+
+**Use the actual URL from Step 5** in WP_HOME and WP_SITEURL:
+
+```bash
+cat > /tmp/wp-config.php << 'EOF'
+<?php
+define('DB_NAME', 'wordpress');
+define('DB_USER', 'wpuser');
+define('DB_PASSWORD', 'wppass123');
+define('DB_HOST', 'localhost');
+define('DB_CHARSET', 'utf8mb4');
+define('DB_COLLATE', '');
+
+define('AUTH_KEY',         'put-unique-phrase-here-1');
+define('SECURE_AUTH_KEY',  'put-unique-phrase-here-2');
+define('LOGGED_IN_KEY',    'put-unique-phrase-here-3');
+define('NONCE_KEY',        'put-unique-phrase-here-4');
+define('AUTH_SALT',        'put-unique-phrase-here-5');
+define('SECURE_AUTH_SALT', 'put-unique-phrase-here-6');
+define('LOGGED_IN_SALT',   'put-unique-phrase-here-7');
+define('NONCE_SALT',       'put-unique-phrase-here-8');
+
+$table_prefix = 'wp_';
+define('WP_DEBUG', false);
+
+// Use the actual URL from Step 5!
+define('WP_HOME', 'https://wordpress-wordpress-1-skills-tests-myplayground.us-1.buddy.app');
+define('WP_SITEURL', 'https://wordpress-wordpress-1-skills-tests-myplayground.us-1.buddy.app');
+define('FORCE_SSL_ADMIN', true);
+
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+if (!defined('ABSPATH')) {
+    define('ABSPATH', __DIR__ . '/');
+}
+require_once ABSPATH . 'wp-settings.php';
 EOF
 
-# Copy configs
-bdy sandbox cp --silent /tmp/wordpress.conf wordpress-lamp:/etc/apache2/sites-available/wordpress.conf
-bdy sandbox cp --silent /tmp/phpmyadmin.conf wordpress-lamp:/etc/apache2/sites-available/phpmyadmin.conf
-
-# Enable sites and start Apache
-bdy sandbox exec command wordpress-lamp "a2dissite 000-default && a2ensite wordpress phpmyadmin && a2enmod rewrite && service apache2 start" --wait
+bdy sandbox cp --silent /tmp/wp-config.php wordpress:/var/www/html/wordpress/wp-config.php
 ```
 
-## Step 7: Expose Endpoints
+## Step 7: Complete Installation
+
+Use the same URL from Step 5:
 
 ```bash
-bdy sandbox endpoint add wordpress-lamp -n wordpress -e 80
-bdy sandbox endpoint add wordpress-lamp -n phpmyadmin -e 8080
+bdy sandbox exec command wordpress "cd /var/www/html/wordpress && wp core install \
+  --url='https://wordpress-wordpress-1-skills-tests-myplayground.us-1.buddy.app' \
+  --title='My Site' \
+  --admin_user=admin \
+  --admin_password=admin123 \
+  --admin_email=admin@example.com \
+  --allow-root" --wait
 ```
 
-## Step 8: Verify
+Done! Visit the URL to see your WordPress site.
+
+---
+
+## Deploy Custom Theme (Optional)
 
 ```bash
-# Check Apache is listening on both ports
-bdy sandbox exec command wordpress-lamp "ss -tlnp | grep apache" --wait
+# Copy theme to sandbox
+bdy sandbox cp --silent /path/to/my-theme wordpress:/var/www/html/wordpress/wp-content/themes/my-theme
 
-# Should show:
-# *:80   ... apache2
-# *:8080 ... apache2
+# Fix permissions
+bdy sandbox exec command wordpress "chown -R www-data:www-data /var/www/html/wordpress/wp-content/themes/my-theme" --wait
+
+# Activate theme
+bdy sandbox exec command wordpress "cd /var/www/html/wordpress && wp theme activate my-theme --allow-root" --wait
 ```
 
-## Credentials
+## Create Sample Content (Optional)
 
-| Service | Username | Password |
-|---------|----------|----------|
-| MySQL | wpuser | wppass123 |
-| MySQL | root | (no password) |
-| phpMyAdmin | wpuser | wppass123 |
+```bash
+bdy sandbox exec command wordpress "cd /var/www/html/wordpress && wp post create \
+  --post_title='Welcome' \
+  --post_content='Hello from WordPress!' \
+  --post_status=publish \
+  --allow-root" --wait
+```
+
+---
+
+## WP-CLI Essentials
+
+All WP-CLI commands require `--allow-root` because sandbox runs as root.
+
+```bash
+# List themes
+wp theme list --allow-root
+
+# Install theme from WordPress.org
+wp theme install flavor --activate --allow-root
+
+# Install plugin
+wp plugin install woocommerce --activate --allow-root
+```
+
+---
 
 ## Troubleshooting
 
 ### WordPress redirects to localhost
 
-**Symptom:** Opening WordPress URL redirects to `http://localhost/wp-admin/install.php`
+WP_HOME/WP_SITEURL not set correctly. Ensure wp-config.php has:
+- The actual URL from `bdy sandbox endpoint add` output
+- These lines BEFORE `require_once ABSPATH . 'wp-settings.php'`
 
-**Cause:** WP_HOME and WP_SITEURL not set, or set after `require_once wp-settings.php`
+### Services not running after restart
 
-**Fix:** Ensure wp-config.php has these lines BEFORE `require_once`:
-```php
-define('WP_HOME', 'https://your-public-url');
-define('WP_SITEURL', 'https://your-public-url');
-if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-    $_SERVER['HTTPS'] = 'on';
-}
-```
-
-### Apache not listening on port 8080
-
-**Symptom:** phpMyAdmin endpoint returns connection refused
-
-**Fix:** Restart Apache after adding the phpmyadmin.conf:
 ```bash
-bdy sandbox exec command wordpress-lamp "service apache2 restart" --wait
-```
-
-### Services not running after sandbox restart
-
-**Symptom:** After `bdy sandbox restart`, WordPress/phpMyAdmin don't work
-
-**Fix:** Manually start services:
-```bash
-bdy sandbox exec command wordpress-lamp "service mariadb start && service apache2 start" --wait
+bdy sandbox exec command wordpress "service mariadb start && service apache2 start" --wait
 ```

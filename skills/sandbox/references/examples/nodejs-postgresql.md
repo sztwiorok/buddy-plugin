@@ -12,13 +12,8 @@ Complete Node.js application with PostgreSQL database and web frontend on Buddy 
 
 ```bash
 bdy sandbox create -i nodejs-api --resources 2x4 \
-  --install-command "apt-get update && apt-get install -y nodejs npm postgresql postgresql-contrib"
-```
-
-Wait for setup to complete:
-```bash
-bdy sandbox status nodejs-api
-# Wait until Setup: SUCCESS
+  --install-command "apt-get update && apt-get install -y nodejs npm postgresql postgresql-contrib" \
+  --wait-for-configured
 ```
 
 **Note:** Using system Node.js (apt) instead of NodeSource for simplicity. For newer Node.js versions, add NodeSource setup script to install commands.

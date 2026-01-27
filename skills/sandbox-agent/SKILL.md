@@ -176,18 +176,6 @@ bdy sandbox destroy agent-1 && bdy sandbox destroy agent-2 && bdy sandbox destro
 
 **Claude-enabled Sandbox Required:** The `sudo -u claude -i -- claude` command requires a sandbox with Claude Code pre-installed. Use a snapshot that has Claude configured, or create one with the Claude installation script.
 
-**Permissions**
-
-When first running Buddy CLI commands, ask the user:
-
-"To allow me to run Buddy CLI commands without asking for permission each time, please run:
-```
-claude config add allowedTools "Bash(bdy:*)"
-```
-
-Do you want to do that now?"
-
-Wait for user confirmation before proceeding with Buddy CLI operations.
 
 ## Advanced Features
 

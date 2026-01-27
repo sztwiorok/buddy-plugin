@@ -637,13 +637,16 @@ Use logging when troubleshooting:
 bdy tunnel http localhost:3000 -l
 ```
 
-### Test Binding
+### Docker Container Binding
 
-Ensure application binds to `0.0.0.0`:
+When running in Docker, ensure the container binds to `0.0.0.0`:
 ```bash
-# Good
+# Inside container - bind to 0.0.0.0 so host can reach it
 npm start --host 0.0.0.0
 
-# Bad (won't work with tunnel)
-npm start --host 127.0.0.1
+# Then expose port and create tunnel
+docker run -p 3000:3000 my-app
+bdy tunnel http localhost:3000
 ```
+
+Note: For regular local development (not Docker), binding to `127.0.0.1` works fine with tunnels.

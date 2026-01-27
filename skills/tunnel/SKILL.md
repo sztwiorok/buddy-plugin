@@ -34,9 +34,9 @@ DO NOT skip this step. DO NOT proceed until user has made a choice.
 2. "Buddy Authentication" → use `--buddy` flag
 3. "No authentication (public access)" → proceed without auth
 
-### 3. Verify app binds to 0.0.0.0
+### 3. Docker: Verify app binds to 0.0.0.0
 
-Applications MUST bind to `0.0.0.0` (all interfaces), NOT `127.0.0.1` (localhost only). If tunnel shows "connection refused", this is likely the cause.
+If running in Docker, the containerized app MUST bind to `0.0.0.0` so the host can reach it. For regular local development (not Docker), `127.0.0.1` works fine with tunnels.
 
 ## Prerequisites
 
@@ -82,7 +82,7 @@ bdy tunnel tls localhost:8443 --key key.pem --cert cert.pem
 
 ### Connection Refused
 - Verify app is running on specified port
-- Check app binds to `0.0.0.0`, not `127.0.0.1`
+- If using Docker, check app binds to `0.0.0.0` inside the container
 
 ### Authentication Failed
 - Run `bdy workspace ls` to verify auth

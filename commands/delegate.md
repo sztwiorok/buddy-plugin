@@ -23,8 +23,8 @@ Delegate an AI task to a Claude agent running in an isolated Buddy Sandbox envir
    - Wait for configuration to complete
 
 3. **Delegate task:**
-   - Execute Claude in sandbox with task prompt
-   - Use `sudo -u claude -i -- claude --dangerously-skip-permissions -p "..."`
+   - Execute Claude in sandbox with `bdy sandbox exec` command
+   - Use `bdy sandbox exec command <sandbox> "sudo -u claude -i -- claude --dangerously-skip-permissions -p '...'"`
 
 4. **Monitor and report:**
    - Show command ID for tracking
@@ -43,6 +43,16 @@ Delegate an AI task to a Claude agent running in an isolated Buddy Sandbox envir
 /delegate "Review this code for security issues"
 /delegate "Refactor to use async/await"
 ```
+
+## Quick Reference
+
+```bash
+bdy sandbox create -i task-sandbox --resources 4x8 --wait-for-configured
+bdy sandbox exec command task-sandbox "sudo -u claude -i -- claude --dangerously-skip-permissions -p 'YOUR TASK'"
+bdy sandbox exec logs task-sandbox <command-id>
+```
+
+> **CLI Tool:** The command is `bdy` (not "buddy"). Always use `bdy sandbox`, `bdy whoami`, etc.
 
 ## Reference
 

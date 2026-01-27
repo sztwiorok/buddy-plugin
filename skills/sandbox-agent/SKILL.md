@@ -69,21 +69,22 @@ Resources: `2x4` (light), `4x8` (standard), `8x16` (heavy). Format: CPUxRAM.
 
 ```bash
 # Standard execution
-bdy sandbox exec command <sandbox-id> "sudo -u claude -i -- claude --dangerously-skip-permissions -p \"YOUR TASK HERE\""
+bdy sandbox exec command <sandbox-id> "sudo -u claude -i -- claude --model=opus --dangerously-skip-permissions -p \"YOUR TASK HERE\""
 
 # With streaming output for live monitoring
-bdy sandbox exec command <sandbox-id> "sudo -u claude -i -- claude --dangerously-skip-permissions --output-format stream-json -p \"YOUR TASK HERE\""
+bdy sandbox exec command <sandbox-id> "sudo -u claude -i -- claude--model=opus --dangerously-skip-permissions --output-format stream-json -p \"YOUR TASK HERE\""
 ```
 
 **Important flags:**
 - `sudo -u claude -i` - Switch to claude user with login shell
 - `--dangerously-skip-permissions` - Enable YOLO mode (safe in isolated sandbox)
+- `--model=opus` - Use Opus model for faster responses
 - `-p "..."` - Pass task prompt
 
 ### Continue Session (Follow-up)
 
 ```bash
-bdy sandbox exec command <sandbox-id> "sudo -u claude -i -- claude -c"
+bdy sandbox exec command <sandbox-id> "sudo -u claude -i -- claude --model=opus --dangerously-skip-permissions -c"
 ```
 
 The `-c` flag continues the most recent session, maintaining full context.
@@ -132,7 +133,7 @@ Main agent can monitor progress by polling logs:
 
 ```bash
 # Start task
-bdy sandbox exec command my-sandbox "sudo -u claude -i -- claude --dangerously-skip-permissions -p \"Complex task...\""
+bdy sandbox exec command my-sandbox "sudo -u claude -i -- claude --model=opus --dangerously-skip-permissions -p \"Complex task...\""
 # Returns command ID
 
 # Poll for progress (repeat as needed)
@@ -155,9 +156,9 @@ bdy sandbox create -i agent-3 --resources 4x8 --wait-for-configured &
 wait
 
 # 2. Delegate tasks (same or with different focus)
-bdy sandbox exec command agent-1 "sudo -u claude -i -- claude --dangerously-skip-permissions -p \"Task with focus A\""
-bdy sandbox exec command agent-2 "sudo -u claude -i -- claude --dangerously-skip-permissions -p \"Task with focus B\""
-bdy sandbox exec command agent-3 "sudo -u claude -i -- claude --dangerously-skip-permissions -p \"Task with focus C\""
+bdy sandbox exec command agent-1 "sudo -u claude -i -- claude --model=opus --dangerously-skip-permissions -p \"Task with focus A\""
+bdy sandbox exec command agent-2 "sudo -u claude -i -- claude --model=opus --dangerously-skip-permissions -p \"Task with focus B\""
+bdy sandbox exec command agent-3 "sudo -u claude -i -- claude --model=opus --dangerously-skip-permissions -p \"Task with focus C\""
 
 # 3. Wait for all and collect results
 bdy sandbox exec logs agent-1 <cmd-id> --wait

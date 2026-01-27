@@ -85,7 +85,7 @@ bdy tunnel tls localhost:8443 --key key.pem --cert cert.pem
 - If using Docker, check app binds to `0.0.0.0` inside the container
 
 ### Authentication Failed
-- Run `bdy workspace ls` to verify auth
+- Run `bdy whoami` to verify auth
 - User may need to run `bdy login` in separate terminal
 
 ## References

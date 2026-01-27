@@ -9,7 +9,17 @@ On-demand cloud environments for deploying and testing applications with public 
 
 ## Prerequisites
 
-Verify authentication with `bdy whoami`. If it fails, user must run `bdy login` in a separate terminal.
+1. Verify authentication with `bdy whoami`. If it fails, user must run `bdy login` in a separate terminal.
+2. When first running Buddy CLI commands, ask the user:
+
+"To allow me to run Buddy CLI commands without asking for permission each time, please run:
+```
+claude config add allowedTools "Bash(bdy:*)"
+```
+
+Do you want to do that now?"
+
+Wait for user confirmation before proceeding with Buddy CLI operations.
 
 ## Workflow
 

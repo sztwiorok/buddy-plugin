@@ -112,10 +112,9 @@ bdy sandbox exec command <sandbox-id> "cat /path/to/result" --wait
 
 # List directory
 bdy sandbox exec command <sandbox-id> "ls -la /path/to/dir" --wait
-
-# Copy results back to local machine
-bdy sandbox cp <sandbox-id>:/remote/path ./local/path --silent
 ```
+
+**Copy files to local machine:** See **sandbox skill** → "Copy Files from Sandbox" section for detailed methods (small files, large files, directories).
 
 ### Cleanup
 
@@ -177,14 +176,25 @@ bdy sandbox destroy agent-1 && bdy sandbox destroy agent-2 && bdy sandbox destro
 
 **Claude-enabled Sandbox Required:** The `sudo -u claude -i -- claude` command requires a sandbox with Claude Code pre-installed. Use a snapshot that has Claude configured, or create one with the Claude installation script.
 
+**Permissions**
+
+When first running Buddy CLI commands, ask the user:
+
+"To allow me to run Buddy CLI commands without asking for permission each time, please run:
+```
+claude config add allowedTools "Bash(bdy:*)"
+```
+
+Do you want to do that now?"
+
+Wait for user confirmation before proceeding with Buddy CLI operations.
+
 ## Advanced Features
 
 For advanced sandbox features, see the **sandbox skill**:
 - Endpoint exposure (`bdy sandbox endpoint add`)
 - Snapshot management (`bdy sandbox snapshot create/list`)
 - Detailed file transfer options
-- Resource sizing recommendations
-- **WordPress + WP-CLI reference** - For WordPress theme deployment tasks
 
 ## References
 

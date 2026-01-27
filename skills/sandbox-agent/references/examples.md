@@ -90,8 +90,9 @@ bdy sandbox exec command test-gen "cat /app/math.test.js" --wait
 # 7. Verify tests pass
 bdy sandbox exec command test-gen "cd /app && npx jest" --wait
 
-# 8. (Optional) Copy tests back to local
-bdy sandbox cp test-gen:/app/math.test.js ./math.test.js --silent
+# 8. (Optional) Copy tests back to local - see sandbox skill "Copy Files from Sandbox"
+output=$(bdy sandbox exec command test-gen "cat /app/math.test.js" --wait 2>&1)
+echo "$output" | grep -v "Command id:" | grep -v "Command finished" | grep -v "New version" > ./math.test.js
 
 # 9. Cleanup
 bdy sandbox destroy test-gen
@@ -386,8 +387,10 @@ bdy sandbox exec logs wp-agent <cmd-id> --wait
 bdy sandbox exec command wp-agent "cd /var/www/html/wordpress && wp theme status --allow-root" --wait
 bdy sandbox exec command wp-agent "ls -la /var/www/html/wordpress/wp-content/themes/agency-starter/" --wait
 
-# 10. Copy theme back locally (optional)
-bdy sandbox cp wp-agent:/var/www/html/wordpress/wp-content/themes/agency-starter ./agency-starter --silent
+# 10. Copy theme back locally (optional) - see sandbox skill "Copy Files from Sandbox"
+bdy sandbox exec command wp-agent "tar -czf - -C /var/www/html/wordpress/wp-content/themes agency-starter | base64 -w0" --wait > /tmp/theme_raw.txt 2>&1
+grep -v "Command id:" /tmp/theme_raw.txt | grep -v "Command finished" | grep -v "New version" > /tmp/theme.b64
+cat /tmp/theme.b64 | base64 -d | tar -xzf - -C ./
 
 # 11. Cleanup
 bdy sandbox destroy wp-agent

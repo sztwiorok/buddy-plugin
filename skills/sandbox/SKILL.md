@@ -35,10 +35,10 @@ bdy sandbox create -i my-app --resources 2x4 \
 ### 2. Copy Files to Sandbox
 
 ```bash
-bdy sandbox cp --silent ./src my-app:/app
+bdy sandbox cp ./src my-app:/app > /dev/null 2>&1
 ```
 
-**ALWAYS use `--silent`** - without it, file copy floods stdout and breaks execution.
+**Redirect output to `/dev/null`** - without it, file copy floods stdout and breaks execution.
 
 ### 3. Execute Commands
 
@@ -70,7 +70,7 @@ cat > config.json << 'EOF'
 EOF
 
 # 2. Copy to sandbox
-bdy sandbox cp --silent config.json my-app:/app/config.json
+bdy sandbox cp config.json my-app:/app/ > /dev/null 2>&1
 ```
 
 ### 4. Add Endpoints (optional)
@@ -137,13 +137,11 @@ cat /tmp/download.b64 | base64 -d | tar -xzf - -C ./downloaded/
 
 ## CRITICAL: Read Examples Before Deploying These Tech Stacks
 
-**Single-Service:**
 - [Node.js](references/examples/nodejs.md)
 - [Python Flask](references/examples/python-flask.md)
-
-**Multi-Service** (read before deploying complex stacks):
 - [Node.js + PostgreSQL](references/examples/nodejs-postgresql.md)
-- [WordPress + MySQL + phpMyAdmin](references/examples/wordpress.md)
+- [WordPress + MySQL](references/examples/wordpress.md)
+- [phpMyAdmin](references/examples/phpmyadmin.md) - database management UI for WordPress/MySQL sandbox
 
 ## References
 

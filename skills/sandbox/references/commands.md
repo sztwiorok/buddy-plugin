@@ -65,12 +65,12 @@ bdy sandbox exec kill <identifier> <command-id>                    # Kill comman
 ## File Transfer
 
 ```bash
-bdy sandbox cp <source> <identifier>:<dest>         # Copy to sandbox
-bdy sandbox cp ./src my-app:/app/src                # Copy directory
-bdy sandbox cp --silent ./file my-app:/app/file     # Silent mode (recommended)
+bdy sandbox cp <source> <identifier>:<dest>                    # Copy to sandbox
+bdy sandbox cp ./src my-app:/app/src                           # Copy directory
+bdy sandbox cp ./file my-app:/app/file > /dev/null 2>&1        # Suppress output (recommended)
 ```
 
-**Important:** Always use `--silent` to suppress progress output.
+**Important:** Redirect output to `/dev/null` to suppress progress output that floods stdout.
 
 ## Endpoint Management
 

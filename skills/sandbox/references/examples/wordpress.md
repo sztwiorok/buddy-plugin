@@ -47,7 +47,7 @@ cat > /tmp/wordpress.conf << 'EOF'
 </VirtualHost>
 EOF
 
-bdy sandbox cp --silent /tmp/wordpress.conf wordpress:/etc/apache2/sites-available/wordpress.conf
+bdy sandbox cp /tmp/wordpress.conf wordpress:/etc/apache2/sites-available/ > /dev/null 2>&1
 
 bdy sandbox exec command wordpress "rm -f /var/www/html/index.html && a2dissite 000-default && a2ensite wordpress && a2enmod rewrite && service apache2 restart" --wait
 ```
@@ -101,7 +101,7 @@ if (!defined('ABSPATH')) {
 require_once ABSPATH . 'wp-settings.php';
 EOF
 
-bdy sandbox cp --silent /tmp/wp-config.php wordpress:/var/www/html/wordpress/wp-config.php
+bdy sandbox cp /tmp/wp-config.php wordpress:/var/www/html/wordpress/ > /dev/null 2>&1
 ```
 
 ## Step 7: Complete Installation
@@ -126,7 +126,7 @@ Done! Visit the URL to see your WordPress site.
 
 ```bash
 # Copy theme to sandbox
-bdy sandbox cp --silent /path/to/my-theme wordpress:/var/www/html/wordpress/wp-content/themes/my-theme
+bdy sandbox cp /path/to/my-theme wordpress:/var/www/html/wordpress/wp-content/themes/ > /dev/null 2>&1
 
 # Fix permissions
 bdy sandbox exec command wordpress "chown -R www-data:www-data /var/www/html/wordpress/wp-content/themes/my-theme" --wait

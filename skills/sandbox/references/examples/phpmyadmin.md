@@ -15,7 +15,7 @@ bdy sandbox exec command wordpress "cd /var/www/html && wget -q https://files.ph
 ## Step 2: Configure phpMyAdmin
 
 ```bash
-cat > /tmp/phpmyadmin-config.php << 'EOF'
+cat > /tmp/config.inc.php << 'EOF'
 <?php
 $cfg['blowfish_secret'] = 'abcdefghijklmnopqrstuvwxyz123456';
 $i = 0;
@@ -25,7 +25,7 @@ $cfg['Servers'][$i]['compress'] = false;
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
 EOF
 
-bdy sandbox cp --silent /tmp/phpmyadmin-config.php wordpress:/var/www/html/phpmyadmin/config.inc.php
+bdy sandbox cp /tmp/config.inc.php wordpress:/var/www/html/phpmyadmin/ > /dev/null 2>&1
 ```
 
 ## Step 3: Configure Apache (port 8080)
@@ -42,7 +42,7 @@ Listen 8080
 </VirtualHost>
 EOF
 
-bdy sandbox cp --silent /tmp/phpmyadmin.conf wordpress:/etc/apache2/sites-available/phpmyadmin.conf
+bdy sandbox cp /tmp/phpmyadmin.conf wordpress:/etc/apache2/sites-available/ > /dev/null 2>&1
 
 bdy sandbox exec command wordpress "a2ensite phpmyadmin && service apache2 restart" --wait
 ```

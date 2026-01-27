@@ -75,7 +75,7 @@ cat > /tmp/test-app/package.json << 'EOF'
 EOF
 
 # 3. Copy to sandbox
-bdy sandbox cp --silent /tmp/test-app test-gen:/app
+bdy sandbox cp /tmp/test-app test-gen:/app > /dev/null 2>&1
 
 # 4. Delegate test generation
 bdy sandbox exec command test-gen "sudo -u claude -i -- claude --dangerously-skip-permissions -p \"Analyze /app/math.js and create comprehensive unit tests using Jest. Install Jest as dev dependency, write tests to /app/math.test.js covering all functions including edge cases, run the tests and ensure they pass.\""
@@ -159,9 +159,9 @@ bdy sandbox create -i reviewer-quality --resources 2x4 --wait-for-configured &
 wait
 
 # 2. Copy code to all sandboxes
-bdy sandbox cp --silent /tmp/review-app reviewer-security:/app &
-bdy sandbox cp --silent /tmp/review-app reviewer-perf:/app &
-bdy sandbox cp --silent /tmp/review-app reviewer-quality:/app &
+bdy sandbox cp /tmp/review-app reviewer-security:/app > /dev/null 2>&1 &
+bdy sandbox cp /tmp/review-app reviewer-perf:/app > /dev/null 2>&1 &
+bdy sandbox cp /tmp/review-app reviewer-quality:/app > /dev/null 2>&1 &
 wait
 
 # 3. Delegate security review
@@ -319,7 +319,7 @@ if (!defined('ABSPATH')) {
 }
 require_once ABSPATH . 'wp-settings.php';
 EOF
-bdy sandbox cp --silent /tmp/wp-config.php wp-agent:/var/www/html/wordpress/wp-config.php
+bdy sandbox cp /tmp/wp-config.php wp-agent:/var/www/html/wordpress/ > /dev/null 2>&1
 
 # 5. Configure Apache
 cat > /tmp/wordpress.conf << 'EOF'
@@ -331,7 +331,7 @@ cat > /tmp/wordpress.conf << 'EOF'
     </Directory>
 </VirtualHost>
 EOF
-bdy sandbox cp --silent /tmp/wordpress.conf wp-agent:/etc/apache2/sites-available/wordpress.conf
+bdy sandbox cp /tmp/wordpress.conf wp-agent:/etc/apache2/sites-available/ > /dev/null 2>&1
 bdy sandbox exec command wp-agent "rm -f /var/www/html/index.html && a2dissite 000-default && a2ensite wordpress && a2enmod rewrite && service apache2 start" --wait
 
 # 6. Expose endpoint

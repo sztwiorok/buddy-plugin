@@ -187,7 +187,7 @@ Automatically loaded when discussing or working with Buddy Sandboxes.
 
 **Provides:**
 - Complete sandbox lifecycle (create, deploy, exec, destroy)
-- File transfer with `bdy sandbox cp --silent`
+- File transfer with `bdy sandbox cp`
 - Endpoint management
 - Command execution and logs
 - Resource configuration

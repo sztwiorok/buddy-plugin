@@ -40,7 +40,7 @@ The `description` field determines when Claude automatically loads the skill bas
 ## Critical AI Agent Requirements
 
 ### Sandbox Operations
-- Always use `--silent` with `bdy sandbox cp` (prevents stdout flood)
+- Redirect `bdy sandbox cp` output: `bdy sandbox cp ./src name:/app > /dev/null 2>&1` (prevents stdout flood)
 - Commands run in background by default; use `--wait` to block until completion
 - Apps must bind to `0.0.0.0`, not `127.0.0.1`
 - Python on Ubuntu 24.04 requires venv (PEP 668)
@@ -71,7 +71,7 @@ bdy whoami
 
 # Sandbox lifecycle
 bdy sandbox create -i <name> --resources 2x4 --install-command "<cmd>"
-bdy sandbox cp --silent ./src <name>:/app
+bdy sandbox cp ./src <name>:/app > /dev/null 2>&1
 bdy sandbox exec command <name> "<command>"           # runs in background
 bdy sandbox exec command <name> "<command>" --wait    # blocks until done
 bdy sandbox endpoint add <name> -n web -e 3000

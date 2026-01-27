@@ -36,8 +36,8 @@ bdy sandbox exec command nodejs-api "su - postgres -c \"psql -c \\\"CREATE DATAB
 ### Option A: Copy Local Project
 
 ```bash
-# Copy local project (use --silent to prevent stdout flood)
-bdy sandbox cp --silent ./my-nodejs-app nodejs-api:/app
+# Copy local project (redirect output to prevent stdout flood)
+bdy sandbox cp ./my-nodejs-app nodejs-api:/app > /dev/null 2>&1
 
 # Install dependencies
 bdy sandbox exec command nodejs-api "cd /app && npm install" --wait
@@ -129,8 +129,8 @@ EOF
 bdy sandbox exec command nodejs-api "mkdir -p /app" --wait
 
 # Copy files to sandbox
-bdy sandbox cp --silent /tmp/package.json nodejs-api:/app/package.json
-bdy sandbox cp --silent /tmp/server.js nodejs-api:/app/server.js
+bdy sandbox cp /tmp/package.json nodejs-api:/app/ > /dev/null 2>&1
+bdy sandbox cp /tmp/server.js nodejs-api:/app/ > /dev/null 2>&1
 
 # Install and start
 bdy sandbox exec command nodejs-api "cd /app && npm install" --wait
@@ -246,7 +246,7 @@ const path = require('path');
 
 **Deploy frontend:**
 ```bash
-bdy sandbox cp --silent /tmp/public nodejs-api:/app/public
+bdy sandbox cp /tmp/public nodejs-api:/app/public > /dev/null 2>&1
 ```
 
 **Restart application:**
@@ -317,9 +317,12 @@ bdy sandbox exec command nodejs-api "su - postgres -c \"psql -c \\\"CREATE USER 
 bdy sandbox exec command nodejs-api "psql -c \"CREATE USER ...\"" --wait
 ```
 
-### 4. Always use `--silent` with `bdy sandbox cp`
+### 4. Redirect `bdy sandbox cp` output
 
-Prevents stdout flood that breaks AI agent execution.
+Prevents stdout flood that breaks AI agent execution:
+```bash
+bdy sandbox cp ./src my-app:/app > /dev/null 2>&1
+```
 
 ## Troubleshooting
 

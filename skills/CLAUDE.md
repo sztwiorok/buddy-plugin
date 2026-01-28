@@ -40,7 +40,9 @@ The `description` field determines when Claude automatically loads the skill bas
 ## Critical AI Agent Requirements
 
 ### Sandbox Operations
+- `bdy sandbox cp` works both directions: localhost→sandbox and sandbox→localhost
 - Redirect `bdy sandbox cp` output: `bdy sandbox cp ./src name:/app > /dev/null 2>&1` (prevents stdout flood)
+- When copying from sandbox and destination exists, use `--merge` or `--replace` flag
 - Commands run in background by default; use `--wait` to block until completion
 - Apps must bind to `0.0.0.0`, not `127.0.0.1`
 - Python on Ubuntu 24.04 requires venv (PEP 668)
@@ -71,7 +73,8 @@ bdy whoami
 
 # Sandbox lifecycle
 bdy sandbox create -i <name> --resources 2x4 --install-command "<cmd>"
-bdy sandbox cp ./src <name>:/app > /dev/null 2>&1
+bdy sandbox cp ./src <name>:/app > /dev/null 2>&1              # copy to sandbox
+bdy sandbox cp <name>:/app/result ./result > /dev/null 2>&1    # copy from sandbox
 bdy sandbox exec command <name> "<command>"           # runs in background
 bdy sandbox exec command <name> "<command>" --wait    # blocks until done
 bdy sandbox endpoint add <name> -n web -e 3000

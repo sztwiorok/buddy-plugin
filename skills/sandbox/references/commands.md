@@ -65,10 +65,25 @@ bdy sandbox exec kill <identifier> <command-id>                    # Kill comman
 ## File Transfer
 
 ```bash
+# Copy to sandbox (localhost → sandbox)
 bdy sandbox cp <source> <identifier>:<dest>                    # Copy to sandbox
 bdy sandbox cp ./src my-app:/app/src                           # Copy directory
 bdy sandbox cp ./file my-app:/app/file > /dev/null 2>&1        # Suppress output (recommended)
+
+# Copy from sandbox (sandbox → localhost)
+bdy sandbox cp <identifier>:<source> <dest>                    # Copy from sandbox
+bdy sandbox cp my-app:/app/results ./results                   # Copy directory
+bdy sandbox cp my-app:/app/file.txt ./local-file.txt           # Copy file
 ```
+
+### Copy Options
+
+| Option | Description |
+|--------|-------------|
+| `-m, --merge` | Merge contents of destination directory with source content |
+| `-r, --replace` | Replace contents of destination directory with source content |
+
+**Note:** When copying from sandbox and the destination already exists, use `--merge` or `--replace`. Run `bdy sandbox cp --help` for detailed examples.
 
 **Important:** Redirect output to `/dev/null` to suppress progress output that floods stdout.
 

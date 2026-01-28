@@ -103,37 +103,24 @@ if ($_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') $_SERVER['HTTPS'] = 'on';
 
 ### 5. Copy Files from Sandbox
 
-The `bdy sandbox cp` command currently only supports uploading (localhost → sandbox). To download files from sandbox, use exec command with cat or base64.
-
-**Method 1: Small text files (<50KB)**
 ```bash
-# Save output to variable, then filter CLI metadata
-output=$(bdy sandbox exec command my-sandbox "cat /path/to/file.txt" --wait 2>&1)
-echo "$output" | grep -v "Command id:" | grep -v "Command finished" | grep -v "New version" > local-file.txt
+# Copy file from sandbox
+bdy sandbox cp my-app:/app/result.txt ./result.txt > /dev/null 2>&1
+
+# Copy directory from sandbox
+bdy sandbox cp my-app:/app/output ./output > /dev/null 2>&1
 ```
 
-**Method 2: Larger text files (50KB - 500KB)**
-
-For larger files, use head with high line count to avoid truncation:
+**When destination already exists**, use `--merge` or `--replace`:
 ```bash
-output=$(bdy sandbox exec command my-sandbox "head -5000 /path/to/large-file.txt" --wait 2>&1)
-echo "$output" | grep -v "Command id:" | grep -v "Command finished" | grep -v "New version" > local-file.txt
+# Replace existing file/directory
+bdy sandbox cp my-app:/app/results ./results --replace > /dev/null 2>&1
+
+# Merge into existing directory
+bdy sandbox cp my-app:/app/results ./results/ --merge > /dev/null 2>&1
 ```
 
-**Method 3: Directories or very large files (>500KB)**
-
-Use tar + base64 encoding:
-```bash
-# 1. Download as base64-encoded tar
-bdy sandbox exec command my-sandbox "tar -czf - -C /home/claude results | base64 -w0" --wait > /tmp/download_raw.txt 2>&1
-
-# 2. Filter CLI metadata
-grep -v "Command id:" /tmp/download_raw.txt | grep -v "Command finished" | grep -v "New version" > /tmp/download.b64
-
-# 3. Decode and extract
-mkdir -p ./downloaded
-cat /tmp/download.b64 | base64 -d | tar -xzf - -C ./downloaded/
-```           
+**Tip:** Run `bdy sandbox cp --help` for detailed examples of merge/replace behavior with files and directories.           
 
 ## CRITICAL: Read Examples Before Deploying These Tech Stacks
 

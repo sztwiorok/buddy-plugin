@@ -13,7 +13,7 @@
       "source": "./",
       "strict": false,
       "description": "Claude Code integration with Buddy.works for managing sandboxes, tunnels, pipelines, and packages",
-      "version": "0.1.17",
+      "version": "0.1.18",
       "author": {
         "name": "Rafal Sztwiorok"
       },

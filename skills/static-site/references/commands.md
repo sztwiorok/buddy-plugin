@@ -7,19 +7,20 @@ Complete reference for `bdy package` commands.
 ### Create Package
 
 ```bash
-bdy package create <name> [flags]
+bdy package create -i <name> [flags]
 ```
 
 | Flag | Description |
 |------|-------------|
+| `-i, --name` | Package name (required) |
 | `-a, --auth <user:pass>` | HTTP Basic authentication |
 | `-b, --buddy` | Buddy account authentication |
 
 **Examples:**
 ```bash
-bdy package create my-site                    # Public package
-bdy package create my-site --buddy            # Buddy auth
-bdy package create my-site -a admin:secret    # HTTP Basic auth
+bdy package create -i my-site                    # Public package
+bdy package create -i my-site --buddy            # Buddy auth
+bdy package create -i my-site -a admin:secret    # HTTP Basic auth
 ```
 
 ### Get Package Info
@@ -60,13 +61,11 @@ bdy package publish <name>@<version> <path> [flags]
 
 | Flag | Description |
 |------|-------------|
-| `--create` | Create package if it doesn't exist |
 | `-f, --force` | Overwrite existing version |
 
 **Examples:**
 ```bash
 bdy package publish my-site@1.0.0 ./dist              # Publish new version
-bdy package publish my-site@1.0.0 ./dist --create     # Create + publish
 bdy package publish my-site@1.0.0 ./dist --force      # Overwrite existing
 ```
 

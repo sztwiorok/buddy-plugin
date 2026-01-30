@@ -13,7 +13,11 @@ Output directory: `./dist`
 ## Deploy
 
 ```bash
-bdy package publish my-app@1.0.0 ./dist --create
+# Create package (first time only)
+bdy package create -i my-app
+
+# Publish version
+bdy package publish my-app@1.0.0 ./dist
 ```
 
 ## Base Path

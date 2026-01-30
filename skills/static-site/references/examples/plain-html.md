@@ -8,16 +8,15 @@ Static HTML sites don't require a build step.
 
 ## Deploy
 
-From project root containing `index.html`:
-
 ```bash
-bdy package publish my-site@1.0.0 . --create
-```
+# Create package (first time only)
+bdy package create -i my-site
 
-From a subdirectory (e.g., `./public`):
+# Publish from project root containing index.html
+bdy package publish my-site@1.0.0 .
 
-```bash
-bdy package publish my-site@1.0.0 ./public --create
+# Or from a subdirectory (e.g., ./public)
+bdy package publish my-site@1.0.0 ./public
 ```
 
 ## Directory Structure

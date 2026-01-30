@@ -46,24 +46,19 @@ npm run build      # Output: ./dist or ./build
 
 **Without auth (public):**
 ```bash
-bdy package create my-site
+bdy package create -i my-site
 ```
 
 **With auth:**
 ```bash
-bdy package create my-site --buddy
-bdy package create my-site -a admin:secret123
+bdy package create -i my-site --buddy
+bdy package create -i my-site -a admin:secret123
 ```
 
 ### 4. Publish Version
 
 ```bash
 bdy package publish my-site@1.0.0 ./dist
-```
-
-**Shortcut (create + publish):**
-```bash
-bdy package publish my-site@1.0.0 ./dist --create
 ```
 
 **Overwrite existing version:**

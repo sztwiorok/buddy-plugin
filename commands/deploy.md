@@ -35,7 +35,8 @@ Deploy application to Buddy cloud.
 **Static site (package):**
 ```bash
 npm run build
-bdy package publish my-site@1.0.0 ./dist --create
+bdy package create -i my-site
+bdy package publish my-site@1.0.0 ./dist
 ```
 
 **Dynamic app (sandbox):**

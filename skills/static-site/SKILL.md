@@ -30,6 +30,19 @@ Before creating a NEW package, you MUST use AskUserQuestion tool.
 
 ## Workflow
 
+### 0. Ensure index.html exists (CRITICAL)
+
+**The main HTML file MUST be named `index.html`** for the URL to serve the page directly. Without it, visitors will see a directory listing instead of the website.
+
+- If deploying a single HTML file (e.g., `mypage.html`), **rename it to `index.html`** before publishing
+- If deploying a directory, ensure it contains an `index.html` at the root
+- Framework builds (Vite, Next.js static export) automatically create `index.html`
+
+```bash
+# Example: rename single HTML file
+mv mypage.html index.html
+```
+
 ### 1. Build Static Assets (if needed)
 
 Most frameworks need a build step:
